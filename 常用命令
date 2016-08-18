@@ -1,0 +1,321 @@
+clearcase命令(转)
+
+1.最基本的操作
+cleartool co -nc xxx.cpp
+cleartool ci -nc xxx.cpp
+2.查看自己总共co了多少文件
+cleartool lscheckout -cview -me -avobs
+
+3.最有用的命令
+cleartool man xxx
+cleartool help xxx
+
+4.新增目录和文件
+cleartool mkdir -c comment new_dir
+cleartool mkelem -c comment new_file.cpp
+
+5.放弃co某个文件
+cleartool unco -keep file.cpp           //保留当前所改动的文件
+cleartool unco -rm   file.cpp
+
+6.主线、分支文件合并
+//查找需要合并的文件
+cleartool findmerge . -fversion /main/xxxx_path -print 
+//比较文件不同
+cleartool diff file.cpp file.cpp@@/main/xxxx_path/LATEST
+//查看最新版本
+cleartool lsvtree file.cpp
+//合并
+cleartool merge -to file.cpp file.cpp@@/main/xxxx_path/LATEST file.cpp@@/main/LATEST
+
+7.标签相关
+//新建标签
+cleartool mklbtype -nc TEST_LABEL
+//给文件打标签
+cleartool mklabel -r TEST_LABEL file.cpp
+//删除标签
+cleartool rmtype lbtype:TEST_LABEL
+//给所有打上TEST_LABEL标签的文件打上TEST_LABEL2标签
+cleartool mklabel -replace -version /main/TEST_LABEL TEST_LABEL2 *
+//查找打上TEST_LABEL标签的所有文件
+cleartool find . -version "lbtype(TEST_LABEL)" -print
+//查找打上TEST_LABEL和TEST_LABEL2标签的文件
+cleartool find . -element 'lbtype_sub(TEST_LABEL) && lbtype_sub(TEST_LABEL2)' -print
+
+8.将整个目录导入clearcase
+clearfsimport -recurse /xxx/xxx/xxx/src /view/zhuj/home/vobs/cc_account
+/xxx/xxx/xxx/src目录（包括此目录下的所有目录和文件）被导入/view/zhuj/home/vobs/cc_account中（/view/zhuj/home/vobs/cc_account/src）
+
+ 
+
+ 
+
+
+clearcase常用命令集锦
+
+1.将整个目录导入clearcase 
+clearfsimport -r‘源路径’ ‘目标路径’
+
+ 
+
+2.加锁
+
+find . -name '*.*' -exec 'cleartool lock nuser userame1,username2 "%CLEARCASE_PN%"'
+
+3．解锁
+
+find . -name '*.*' -exec 'cleartool unlock "%CLEARCASE_PN%"'
+
+4.转换格式
+
+chtype -f compressed_file “fileName”
+
+5.查看VOB的基本信息和UUID
+
+des -l vob:.
+
+6.删除视图
+
+rmview -uuid "UUID"
+
+7.删除lost+found
+
+find . -name '*.*' -exec 'cleartool rmelem -f "%CLEARCASE_PN%"'
+
+8.查询某一天的修改记录
+
+cleartool lshis -r -since 07-dec
+
+9.最基本的操作 
+cleartool co -nc filename 
+cleartool ci -nc filename
+
+10.查看自己总共co了多少文件 
+cleartool lscheckout -cview –me -vobs
+
+11.make目录和文件 
+cleartool mkdir -c comment newdirectory
+
+cleartool mkelem -c comment newfilename
+
+12.主线、分支文件合并 
+//查找需要合并的文件 
+cleartool findmerge . -fversion /main/TEST_Path -print 
+//比较文件不同 
+cleartool diff filename [url=mailto:file.cpp@@/main/xxxx_path/LATEST]filename@@/main/TEST_Path/LATEST 
+//查看最新版本 
+cleartool lsvtree filename
+
+//合并 
+cleartool merge -to filename [url=mailto:file.cpp@@/main/xxxx_path/LATEST]filename @@/main/TEST_path/LATEST [url=mailto:file.cpp@@/main/LATEST]filename @@/main/LATEST
+
+13.标签相关 
+cleartool mklbtype -nc TEST_LABEL 
+cleartool mklabel -r TEST_LABEL filename 
+cleartool rmtype lbtype:TEST_LABEL 
+//给所有打上TEST_LABEL标签的文件打上TEST_LABEL标签 
+cleartool mklabel -replace -version /main/TEST_LABEL TEST_LABEL * 
+//查找打上TEST_LABEL标签的所有文件 
+cleartool find . -version "lbtype(TEST_LABEL)" -print 
+//查找打上TEST_LABEL和TEST_LABEL1标签的文件 
+cleartool find . -element 'lbtype_sub(TEST_LABEL) && lbtype_sub(TEST_LABEL1)' -print
+
+14.察看某目录下的文件
+
+ls
+
+15.man/help命令 
+cleartool man xxx 
+cleartool help xxx
+
+16.放弃co某个文件 
+cleartool unco -keep filename 
+cleartool unco -rm filename
+
+17.更改VOB的Owner:
+
+cleartool protectvob –chown root /vob/vob.vbs
+
+18. 更改VOB的Group:
+
+cleartool protectvob –chgrp alluser /vob/vob.vbs
+
+19.增加Additional Group:
+
+cleartool protectvob –add_group group1 /vob/vob.vbs
+
+20.删除Additional Group:
+
+cleartool protectvob –delete_group group1 /vob/vob.vbs
+
+21. 更改group、owner、mod
+
+protect -r -chgrp groupname–chown username -chmod 770 .
+
+22.创建VOB
+
+cleartool mkvob -tag /vobtags/test_code -c "Test" "D:\Data\Tets.vbs"
+
+23. Mount vob 
+Cleartool mount /vobtags/vob 
+24. 创建视图 
+cleartool mkview –tag test /ccvob/views/test.vws 
+25. 设置当前视图 
+cleartool setview test
+
+26．设置当前的activity 
+cleartool setactivity activityname
+
+27. Check out 
+Check out一个文件
+
+Cleartool checkout [-reserve][-unreserve] filename
+
+
+Check out前目录
+
+Cleartool checkout .
+
+
+Check out当前目录下所有文件
+
+Cleartool Checkout –nc *.*
+
+Check out当前目录下所有的文件和目录中的文件
+
+cleartool find . $file -exec ‘cleartool checkout -nc $CLEARCASE_PN’ 
+28. Check in 
+Check in 一个文件
+
+Cleartool checkin filename
+
+Check in 当前目录 
+Cleartool checkin .
+
+Check in 当前目录下所有文件.
+
+Cleartool Checkin –nc *.*
+
+Check in当前目录下所有的文件和目录中的文件
+
+cleartool find . $file -exec ‘cleartool checkin -nc –ide $CLEARCASE_PN’
+
+
+以上内容来自：http://hi.baidu.com/is%CC%EC%B2%C5/blog/item/36bfbfc83cced1117f3e6fa0.html
+
+ 
+
+常用命令：
+创建view：clt mkview -tag view_abcd /view_store/view_abcd.vws
+设置view: clt setview view_abcd
+编辑config specification: clt edcs
+
+创建branch type：clt mkbrtype dbg_branch1_comments
+在某个文件的当前branch上， 拉出一个branch：
+clt mkbranch dbg_branch1_comments filename.c
+
+now you have make branch on the file, and checked it out.
+you can edit it with gvim.
+After changed codes, you can complie it successfully, and test the result, you can check it in.
+clt ci filename.c
+If you want to check out it again:
+clt co filename.c
+
+To change the branch name to a formula name you can use the command:
+clt rename brtype:dbg_branch1_comments brtype:crnumber_branch1_comments
+
+To see the version tree of a file:
+clt lsvtree -g filename.c
+
+To see which files is included in a branch, you can edit a script like this find_branch.sh:
+
+echo "$1"
+cleartool find -avobs -element "brtype("$1")" -nxn -print | xargs cleart
+ool ls -s|grep "$1"
+
+To compare files, I write a useful script file mydiff.
+
+You can use xcc& to open graphic clearcase. So you can do most thing through the menu.
+
+以上内容来自：http://www.diybl.com/course/4_webprogram/asp.net/netjs/20071020/78573.html
+
+ 
+
+ 
+
+clearcase实用命令
+
+查找分支上的文件
+find . -branch brtype(branchname) -print 
+创建分支
+mkbrtype -c "comment" branchname 
+创建Label
+mklbtype -c "comment" labelname 
+用于 cleartool find 查询:
+cleartool find -all -version “lbtype(REL1)” -print
+find . -version 'lbtype(LABEL)' -print 
+锁分支命令
+lock brtype:branchname 
+创建trigger
+trigger已存在
+mktrtype mktrtype -replace -element -all -preop mkelem -nusers shiquan -exec http://www.cnblogs.com/samcn/admin/file://192.168.1.5/cc_trigger/false.bat NO_RM_MK
+trigger不存在
+mktrtype mktrtype -element -all -preop mkelem -nusers shiquan -exec http://www.cnblogs.com/samcn/admin/file://192.168.1.5/cc_trigger/false.bat NO_RM_MK
+日常开发人员常用命令
+
+开发人员常用命令
+1.       建立vob
+mkvob –tag /vobtags/vob1 –c “ VOB for project1” /vobstore/vob1.vbs
+2.       Mount vob
+Cleartool mount /vobtags/vob1
+3.       创建视图
+cleartool mkview –tag test1 /ccvob/views/test1.vws
+4.       设置当前视图
+cleartool setview test1
+5.       在VOB的根目录下到入数据：
+clearfsimport –recurse –c “ comments “ /home/setup/* . ，注意命令的最后为圆点，表示当前目录。
+6.       改变VOB的Owner: 
+cleartool protectvob –chown root /vobstore/vob1.vbs
+7.       改变VOB的Group:
+cleartool protectvob –chgrp alluser /vobstore/vob1.vbs
+8.       增加Additional Group:
+cleartool protectvob –add_group group1 /vobstore/vob1.vbs
+9.       删除Additional Group:
+cleartool protectvob –delete_group group1 /vobstore/vob1.vbs
+修改vob中数据的权限信息
+10.   将jmccboss VOB 中所有元素Owner 改成ccadmin，Group改成jmccboss:
+Cleartool protect –chown ccadmin –chgrp jmccboss .
+.为vob根目录
+11.   将jmccboss VOB 中所有元素权限 改成对ccadmin（rwx），jmccboss(rwx)，其他VOB附属组成员（r-x）:
+例： Cleartool protect –recurse –chmod 775 . ，
+12.   Mount vob
+Cleartool mount /vobtags/vob1
+13.   创建视图
+cleartool mkview –tag test1 /ccvob/views/test1.vws
+14.   设置当前视图
+cleartool setview test1
+15.   在VOB的根目录下到入数据：
+clearfsimport –recurse –c “ comments “ /home/setup/* . ，注意命令的最后为圆点，表示当前目录。
+16.   Check out 
+Cleartool checkout [-reserve][-unreserve] b.c    Check out一个文件
+Cleartool checkout .   Check out当前目录
+Cleartool Checkout –nc *.*    Check out当前目录下所有文件
+cleartool find . $file -exec ‘cleartool checkout -nc $CLEARCASE_PN’ 
+Check out当前目录下所有的文件和目录中的文件
+17.   Check in
+Cleartool checkin b.c    Check in 一个文件
+Cleartool checkin .    Check in 当前目录
+Cleartool Checkin –nc *.*   Check in 当前目录下所有文件.
+cleartool find . $file -exec ‘cleartool checkin -nc –ide $CLEARCASE_PN’ 
+Check in当前目录下所有的文件和目录中的文件 
+18.   建立一个snapshot view
+cleartool mkview –tag pat_2_snapshot_view –snapshot /viewstore/pat/myviews.vws
+19.   编辑config spe
+Cleartool edcs
+20.   更新snapshot view
+cleartool update pat_2_snapshot_view
+21．设置当前的activity
+cleartool setactivity activityname
+      gaibian leixing: chtype binary_delta_file Estonian.r 
+错误 :clearfsimport: Error: Trouble was encountered importing the following elements:
+        D:\work\shiquan_study\Broadcom070122\BCM_R2.10_A1\mmi\design\gui\res\ffs_preload\CD_5_2_6.dm
